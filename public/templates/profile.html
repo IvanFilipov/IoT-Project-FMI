@@ -32,10 +32,10 @@
                     <select class="hidden-when-not-logged-in hidden-when-not-current-user changeStatus">
                     {{#ifCond public '1'}}
                         <option value="1" selected>public</option>
-                        <option value="0">non-public</option>
+                        <option value="0">private</option>
                     {{else}}
                         <option value="1">public</option>
-                        <option value="0" selected>non-public</option>
+                        <option value="0" selected>private</option>
                     {{/ifCond}}
                     </select>
                     </div>
@@ -137,7 +137,7 @@
 
                             <select class="changeStatus selectpicker form-control">
                                 <option value="1">public</option>
-                                <option value="0">non-public</option>
+                                <option value="0">private</option>
                             </select>
                         </div>
                     </div>
