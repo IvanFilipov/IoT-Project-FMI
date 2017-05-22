@@ -1,0 +1,54 @@
+#page {
+    text-align: center
+}
+
+#main-nav {
+    text-align: center;
+    display: inline-block;
+    margin: 0 auto;
+}
+
+#page .hidden-when-not-logged-in {
+    display: none;
+}
+
+#page.logged-in .hidden-when-not-logged-in {
+    display: initial;
+}
+
+#page.logged-in .visible-when-not-logged-in {
+    display: none;
+}
+
+ul, li {
+    list-style: none;
+}
+
+.visualisation {
+    width: 800px;
+    height: 400px;
+    padding: 0 0 0 0;
+}
+// svg {
+//     margin: 0 0 0 0;
+//     padding: 0 0 0 0;
+// }
+
+img.media-object {
+    height:120px;
+}
+
+.esp_control{
+    float: right;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.area {
+  fill: steelblue;
+}

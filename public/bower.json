@@ -1,0 +1,23 @@
+{
+  "name": "learning-resources",
+  "description": "Application for sharing, recomending and browsing learning resources",
+  "main": "app.js",
+  "authors": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.1.1",
+    "bootstrap": "^3.3.7",
+    "toastr": "^2.1.3",
+    "cryptojslib": "^3.1.2",
+    "navigo": "^3.0.0",
+    "handlebars": "^4.0.5",
+    "eonasdan-bootstrap-datetimepicker": "^4.17.47"
+  }
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Fortune Cookies</title>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="bower_components/toastr/toastr.css">
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script type="text/javascript" src="bower_components/moment/min/moment.min.js"></script> <!-- datapicker -->
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script type="text/javascript" src="bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script> <!-- datapicker -->
+    <link rel="stylesheet" href="bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" /> <!-- datapicker -->
+    <script src="bower_components/toastr/toastr.js"></script>
+</head>
+
+<body id="page">
+    <header id="header">
+        <h1>GoodMats</h1>
+        <!--<nav id="main-nav" class="nav-navbar">
+            <ul class="nav nav-tabs">-->
+        <nav class="navbar navbar-default">
+            <ul class="nav navbar-nav" id="main-nav">
+                <li class="home active">
+                    <a href="#/book">Book</a>
+                </li>
+                <li class="home">
+                    <a href="#/profiles">Users</a>
+                </li>
+                <li class="visible-when-not-logged-in">
+                    <a href="#/login">Login</a>
+                </li>
+                <li class="visible-when-not-logged-in">
+                    <a href="#/register">Register</a>
+                </li>
+                <li class="hidden-when-not-logged-in">
+                    <a class="btn-nav-profile" href="#/profiles">Profile</a>
+                </li>
+                <li class="hidden-when-not-logged-in">
+                    <a class="btn-nav-logout" href="#/login">Logout</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="container" class="container text-center">
+    </section>
+    <!-- <script src="node_modules/d3/build/d3.min.js"></script> -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.0/d3.min.js' charset='utf-8'></script>
+    <script src="bower_components/handlebars/handlebars.js"></script>
+    <script src="bower_components/navigo/lib/navigo.js"></script>
+    <script src="js/requester.js"></script>
+    <script src="js/templates.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/controllers.js"></script>
+    <script src="js/controllers/dataController.js"></script>
+    <script src="js/controllers/profilesController.js"></script>
+    <script src="js/controllers/espController.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/uiControl.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,169 @@
+<div class="container-fluid well span6">
+	<div class="row-fluid">
+        
+        <div class="span8">
+            <h3>User {{username}}</h3>
+            <h6>Id {{id}}</h6>
+            {{#if ESPS}}
+
+            <table class="table table-bordered table-striped esp-table">
+                <thead>
+                <tr>
+                <th class="resource-name">Id</th>
+                <th>Name</th>
+                <th>Unic ID</th>
+                <th>Moment tempreture</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{#ESPS}}
+                <tr>
+                <td>{{id}}</td>
+                <td>{{name}}
+                    <div class="esp_control">
+                    <div class="" data-username="{{username}}" data-unicid="{{unic_id}}" data-public="{{public}}" data-espname="{{name}}">
+
+                    <button type="button" class="btn btn-info" data-unicid="{{unic_id}}" data-toggle="modal" data-target="#infoModal">Info</button>
+
+                    <button class="hidden-when-not-logged-in hidden-when-not-current-user btn btn-danger btn-controll" data-title="Delete" data-toggle="modal" data-toggle="modal" data-target="#controlModal">Control</button>
+
+                    <button class="hidden-when-not-logged-in hidden-when-not-current-user btn btn-danger btn-xs btn-delete-esp" data-title="Delete" data-toggle="modal" data-target="#delete" ><span class="glyphicon glyphicon-trash"></span></button>
+
+                    <select class="hidden-when-not-logged-in hidden-when-not-current-user changeStatus">
+                    {{#ifCond public '1'}}
+                        <option value="1" selected>public</option>
+                        <option value="0">non-public</option>
+                    {{else}}
+                        <option value="1">public</option>
+                        <option value="0" selected>non-public</option>
+                    {{/ifCond}}
+                    </select>
+                    </div>
+                    </div>   
+                </td>
+                <td>{{unic_id}}</td>
+                <td>{{temperature}}</td>
+                </tr>
+                {{/ESPS}}
+                </tbody>
+            </table>
+
+
+              <div class="modal fade" id="infoModal" role="dialog">
+                <div class="modal-dialog modal-lg">
+                
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Modal Header</h4>
+                    </div>
+                    <div class="modal-body">
+
+
+
+
+
+
+<div class="container">
+    <div class="row">
+        <div class='col-sm-3'>
+            <div class="form-group">
+                <div class='input-group date form_datetime' id='datetimepickerFrom'>
+                    <input type='text' class="form-control" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-3'>
+            <div class="form-group">
+                <div class='input-group date form_datetime' id='datetimepickerTo'>
+                    <input type='text' class="form-control" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                    <!-- <input type="time" name=""> -->
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-show-data col-sm-1">Show</button>
+
+    </div>
+    <div class="row">
+        <div class='visualisation'>
+            <!-- <svg width="500" height="300" class="visualisationContainer"></svg> -->
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                  
+                </div>
+              </div>
+
+              <div class="modal fade" id="controlModal" role="dialog">
+                <div class="modal-dialog">
+                
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">ESP Control Panel</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="form-inline modal-esp-data">
+                            <input type="hidden" id="controlModelParams">
+                            <label for="usr">New Name:</label>
+                            <input type="text" class="form-control" id="esp-new-name">
+                            <button type="button" class="btn btn-primary btn-rename-esp" data-dismiss="modala">Rename</button>
+                            <button class="btn btn-danger btn-delete-esp" data-title="Delete" data-toggle="modal" data-target="#delete" >Delete</button>
+
+                            <select class="changeStatus selectpicker form-control">
+                                <option value="1">public</option>
+                                <option value="0">non-public</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                  
+                </div>
+              </div>
+            {{else}}
+            <h5>No ESPS</h5>
+            {{/if}}
+
+            <div class="hidden-when-not-current-user hidden-when-not-logged-in " data-username="{{username}}">
+                <div class="well">
+                <label for="text">ESP name</label> 
+                    <input id="esp-name" name="text" class="form-control" 
+                        value="testtesttesttesttesttest">
+                </br>
+                <label for="text">Unic id</label> 
+                    <input id="unic-id" name="text" class="form-control" 
+                        value="testtesttesttesttesttest">
+                </br>
+                <button class="btn btn-success btn-add-ESP">Add ESP</button>
+                </div>
+            </div>
+        </div>
+</div>
