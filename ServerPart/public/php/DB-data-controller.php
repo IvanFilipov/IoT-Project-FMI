@@ -37,7 +37,7 @@ class SQLDBDataController extends IDBDataController
 
 	public function getDataByUnicIdFromAndTo($unic_id, $fromTime, $toTime)
 	{
-		$query = "SELECT temperature, moment_time FROM data WHERE unic_id = :unic_id AND moment_time > :fromTime AND moment_time < :toTime ";
+		$query = "SELECT temperature, humidity, moment_time FROM data WHERE unic_id = :unic_id AND moment_time > :fromTime AND moment_time < :toTime ";
 		$statement = $this->db->connection->prepare($query);
 		$statement->bindParam(":unic_id",$unic_id);
 		$statement->bindParam(":fromTime", $fromTime);

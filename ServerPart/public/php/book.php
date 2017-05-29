@@ -1,8 +1,8 @@
 <?php 
 	require_once("DB-esp-controller.php");
 	$dbEspController = new DBESPController();
-	$esps = $dbEspController->getAll();
 
+	$esps = $dbEspController->getAll();
 
 	header('Content-Type: application/json');
 	$res;

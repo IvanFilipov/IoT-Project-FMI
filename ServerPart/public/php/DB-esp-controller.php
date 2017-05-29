@@ -14,8 +14,9 @@ abstract class IDBESPController
 	abstract public function rename($username, $unic_id, $newName);
 	abstract public function changeStatus($username, $unic_id, $newStatus);
 	abstract public function getAll();
-	abstract public function getESPSByLoginUsername($username);
-	abstract public function getESPSByNotLoginUsername($username);
+	abstract public function getAllByLogin($username);
+	abstract public function getUserESPSByLoginUsername($username);
+	abstract public function getUserESPSByNotLoginUsername($username);
 	abstract public function exist($unic_id);
 }
 
@@ -77,7 +78,7 @@ class SQLDBESPController extends IDBESPController
 	{
 
 		$query = "
-SELECT ESPS.id, ESPS.unic_id, data.temperature, ESPS.name, ESPS.username, ESPS.public FROM ESPS LEFT JOIN (select *
+SELECT ESPS.id, ESPS.unic_id, data.temperature, data.humidity, data.battery, ESPS.name, ESPS.username, ESPS.public FROM ESPS LEFT JOIN (select *
 			    from data as a
 			    where a.id = (select max(id) from data where unic_id = a.unic_id group by a.unic_id)
 			    group by unic_id) as data ON data.unic_id = ESPS.unic_id
@@ -89,11 +90,22 @@ WHERE ESPS.public = TRUE";
 		$esps = $statement->fetchAll(PDO::FETCH_ASSOC);
 		return $esps;
 	}
-	public function getESPSByLoginUsername($username)
+	public function getAllByLogin($username)
+	{
+		$query = "SELECT name FROM ESPS WHERE ESPS.username = :username OR public = TRUE";
+		$statement = $this->db->connection->prepare($query);
+		$statement->bindParam(":username",$username);
+		$statement->execute();
+
+		$count = $statement->rowCount();
+		$esps = $statement->fetchAll(PDO::FETCH_ASSOC);
+		return $esps;
+	}
+	public function getUserESPSByLoginUsername($username)
 	{
 
 		$query = "
-SELECT ESPS.id, ESPS.unic_id, data.temperature, ESPS.name, ESPS.username, ESPS.public FROM ESPS LEFT JOIN (select *
+SELECT ESPS.id, ESPS.unic_id, data.temperature, data.humidity, data.battery, ESPS.name, ESPS.username, ESPS.public FROM ESPS LEFT JOIN (select *
 			    from data as a
 			    where a.id = (select max(id) from data where unic_id = a.unic_id group by a.unic_id)
 			    group by unic_id) as data ON data.unic_id = ESPS.unic_id
@@ -106,10 +118,10 @@ WHERE ESPS.username = :username";
 		$esps = $statement->fetchAll(PDO::FETCH_ASSOC);
 		return $esps;
 	}
-	public function getESPSByNotLoginUsername($username)
+	public function getUserESPSByNotLoginUsername($username)
 	{
 		$query = "
-SELECT ESPS.id, ESPS.unic_id, data.temperature, ESPS.name, ESPS.username, ESPS.public FROM ESPS LEFT JOIN (select *
+SELECT ESPS.id, ESPS.unic_id, data.temperature, data.humidity, data.battery, data.battery_status, ESPS.name, ESPS.username, ESPS.public FROM ESPS LEFT JOIN (select *
 			    from data as a
 			    where a.id = (select max(id) from data where unic_id = a.unic_id group by a.unic_id)
 			    group by unic_id) as data ON data.unic_id = ESPS.unic_id

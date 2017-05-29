@@ -19,10 +19,10 @@
 			$esps = "";
 			if($dbUserController->isLogin($username ,$authKey))
 			{
-				$esps = $dbEspController->getESPSByLoginUsername($username);
+				$esps = $dbEspController->getUserESPSByLoginUsername($username);
 			}
 			else{
-				$esps = $dbEspController->getESPSByNotLoginUsername($username);
+				$esps = $dbEspController->getUserESPSByNotLoginUsername($username);
 			}
 
 			$user['ESPS'] = $esps;

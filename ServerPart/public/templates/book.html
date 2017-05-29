@@ -11,6 +11,8 @@
                 <th>Name</th>
                 <th>Username</th>
                 <th>Moment tempreture</th>
+                <th>Humidity</th>
+                <th>Battery</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -24,6 +26,8 @@
                 </td>
                 <td><a href="#/profiles/{{username}}">{{username}}</a></td>
                 <td>{{temperature}}</td>
+                <td>{{humidity}}</td>
+                <td>{{battery}}%</td>
                 </tr>
                 {{/ESPS}}
                 </tbody>
@@ -65,8 +69,10 @@
                 <button type="button" class="btn btn-show-data col-sm-1">Show</button>
             </div>
             <div class="row">
-                <div class='visualisation'>
+                <div class='visualisation temp'>
                     <!-- <svg width="500" height="300" class="visualisationContainer"></svg> -->
+                </div>
+                <div class='visualisation humidity'>
                 </div>
             </div>
         </div>

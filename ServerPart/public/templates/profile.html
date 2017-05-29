@@ -13,6 +13,8 @@
                 <th>Name</th>
                 <th>Unic ID</th>
                 <th>Moment tempreture</th>
+                <th>Humidity</th>
+                <th>Battery</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -43,6 +45,8 @@
                 </td>
                 <td>{{unic_id}}</td>
                 <td>{{temperature}}</td>
+                <td>{{humidity}}</td>
+                <td>{{battery}}%</td>
                 </tr>
                 {{/ESPS}}
                 </tbody>
@@ -59,11 +63,6 @@
                       <h4 class="modal-title">Modal Header</h4>
                     </div>
                     <div class="modal-body">
-
-
-
-
-
 
 <div class="container">
     <div class="row">
@@ -92,10 +91,13 @@
 
     </div>
     <div class="row">
-        <div class='visualisation'>
+        <div class='visualisation temp_graphic'>
             <!-- <svg width="500" height="300" class="visualisationContainer"></svg> -->
         </div>
+        <div class='visualisation humidity_graphic'>
+        </div>
     </div>
+
 </div>
 
 

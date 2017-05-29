@@ -55,8 +55,18 @@ var dataService = (function(){
         return requester.get(`php/user.php`, options);
     }
 
-    function allEsps() {
-        return requester.get("php/book.php");
+    function allEsps() { 
+        let options;
+        if(isLoggedIn())   
+        {
+            options = {
+                headers: {
+                    [KEY_STORAGE_USERNAME]: localStorage.getItem(KEY_STORAGE_USERNAME),
+                    [HTTP_HEADER_KEY]: localStorage.getItem(KEY_STORAGE_AUTH_KEY)
+                }
+            };
+        }
+        return requester.get("php/book.php", options);
     }
 
     function addESP(esp) {

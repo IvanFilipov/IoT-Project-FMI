@@ -51,7 +51,7 @@ var dataController = (function() {
             dataService.getEspData(esp).then(function(response) {
                 let data = response.result.data;
                 data = data.slice();
-                proccessData2(data);
+                proccessTemperature(data);
 
             });
             $(".btn-show-data").click(function(){ 
@@ -68,7 +68,7 @@ var dataController = (function() {
                     let data = response.result.data;
                     data = data.slice();
                     // console.log(data);
-                    proccessData2(data);
+                    proccessTemperature(data);
 
                 });
             });
@@ -141,39 +141,39 @@ var dataController = (function() {
               .text("Price ($)");
         });
     }
-    function proccessData2(data) {
-        let widthPixels = $(".visualisation").width();
-        let heightPixels = $(".visualisation").height();
+    function proccessTemperature(data) {
+        let widthPixels = $(".temp_graphic").width();
+        let heightPixels = $(".temp_graphic").height();
 
-        var margin = {top: 20, right: 20, bottom: 75, left: 50},
+        let margin = {top: 20, right: 20, bottom: 75, left: 50},
             width = widthPixels - margin.left - margin.right,
             height = heightPixels - margin.top - margin.bottom;
 
-        var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
+        let parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
 
-        var x = d3.time.scale()
+        let x = d3.time.scale()
             .range([0, width]);
 
-        var y = d3.scale.linear()
+        let y = d3.scale.linear()
             .range([height, 0]);
 
-        var xAxis = d3.svg.axis()
+        let xAxis = d3.svg.axis()
             .scale(x)
             .orient("bottom")
             .tickFormat(d3.time.format("%m/%d %H:%M"));;
 
-        var yAxis = d3.svg.axis()
+        let yAxis = d3.svg.axis()
             .scale(y)
             .orient("left");
 
-        var area = d3.svg.area()
+        let area = d3.svg.area()
             .x(function(d) { return x(d.date); })
             .y0(height)
             .y1(function(d) { return y(d.close); });
 
         // var svg = d3.select("body").append("svg")
-        d3.select(".visualisation svg").remove();
-        var svg = d3.select(".visualisation")
+        d3.select(".temp_graphic svg").remove();
+        let svg = d3.select(".temp_graphic")
             .append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
@@ -212,6 +212,79 @@ var dataController = (function() {
                 .attr("dy", ".71em")
                 .style("text-anchor", "end")
                 .text("Temperature");
+    }
+
+    function proccessHumidity(data) {
+        let widthPixels = $(".humidity_graphic").width();
+        let heightPixels = $(".humidity_graphic").height();
+
+        let margin = {top: 20, right: 20, bottom: 75, left: 50},
+            width = widthPixels - margin.left - margin.right,
+            height = heightPixels - margin.top - margin.bottom;
+
+        let parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
+
+        let x = d3.time.scale()
+            .range([0, width]);
+
+        let y = d3.scale.linear()
+            .range([height, 0]);
+
+        let xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom")
+            .tickFormat(d3.time.format("%m/%d %H:%M"));;
+
+        let yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left");
+
+        let area = d3.svg.area()
+            .x(function(d) { return x(d.date); })
+            .y0(height)
+            .y1(function(d) { return y(d.close); });
+
+        // var svg = d3.select("body").append("svg")
+        d3.select(".humidity_graphic svg").remove();
+        let svg = d3.select(".humidity_graphic")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        data.forEach(function(d) {
+            d.date = parseDate(d.moment_time);
+            d.close = +d.humidity;
+        }); 
+
+        x.domain(d3.extent(data, function(d) { return d.date; }));
+        y.domain([0, d3.max(data, function(d) { return d.close; })]);
+
+        svg.append("path")
+            .datum(data)
+            .attr("class", "area")
+            .attr("d", area);
+
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis)
+        .selectAll("text")  
+            .style("text-anchor", "end")
+            .attr("dx", "-.2em")
+            .attr("dy", ".07em")
+            .attr("transform", "rotate(-50)" );
+
+        svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis)
+            .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", ".71em")
+                .style("text-anchor", "end")
+                .text("Humidity");
     }
 
     return {
