@@ -52,7 +52,7 @@ var dataController = (function() {
                 let data = response.result.data;
                 data = data.slice();
                 proccessTemperature(data);
-
+                proccessHumidity(data);
             });
             $(".btn-show-data").click(function(){ 
                 unic_id = self.parent().data('unicid') || self.data('unicid');
@@ -69,6 +69,7 @@ var dataController = (function() {
                     data = data.slice();
                     // console.log(data);
                     proccessTemperature(data);
+                    proccessHumidity(data);
 
                 });
             });
