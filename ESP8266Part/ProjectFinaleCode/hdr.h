@@ -11,7 +11,7 @@ WiFiClientSecure client;
 
 //------- WiFi Settings -------
 const char* ssid = "AndroidHotspo";       // your network SSID (name)
-const char* password = "vanaka11";  // your network key
+const char* password = "**********************";  // your network key
 const char* host = "88.87.1.226"; //where the server is
 #define HOSTPORT 80
 
