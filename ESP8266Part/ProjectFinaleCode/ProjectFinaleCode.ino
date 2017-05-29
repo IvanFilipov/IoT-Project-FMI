@@ -58,11 +58,8 @@ void setup() {
 
   delay(2000); //bme needs some time 
   
-  GatherData();
-  Serial.println(allData.Temperature);
-  Serial.println(allData.Humidity);
-  Serial.println(allData.EspId);
-  Serial.println(allData.BatteryLevel);
+  if(SendData())
+     Serial.println("successfully sent !");
   
  
 }
@@ -70,7 +67,6 @@ void setup() {
 void loop() {
 
   delay(2000);
-
   if ( SecProblem() ) {
     triggerIftttEvent();
     sendTelegramMessage();

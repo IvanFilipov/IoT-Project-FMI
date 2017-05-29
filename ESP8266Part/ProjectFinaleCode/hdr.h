@@ -1,5 +1,4 @@
-#pragma once
-#ifndef _HDR 
+#ifndef _HDR
 #define _HDR
 
 //wifi -----------------------------------------------
@@ -11,8 +10,10 @@
 WiFiClientSecure client;
 
 //------- WiFi Settings -------
-char ssid[] = "AndroidHotspo";       // your network SSID (name)
-char password[] = "vanaka11";  // your network key
+const char* ssid = "AndroidHotspo";       // your network SSID (name)
+const char* password = "vanaka11";  // your network key
+const char* host = "88.87.1.226"; //where the server is
+#define HOSTPORT 80
 
 
 //security -----------------------------------------------
@@ -51,11 +52,11 @@ struct {
   String EspId;
   String BatteryLevel;
 
-  
-}allData;
+
+} allData;
 
 
-//temperature sensor 
+//temperature sensor
 
 #include <Wire.h>
 #include <SPI.h>
@@ -76,32 +77,94 @@ Adafruit_BME280 bme; // I2C
 //function realizations ----------------------------------------
 
 
-void GatherData(){
+void GatherData() {
 
   Serial.println(bme.readTemperature());
-  
+
   allData.Temperature = bme.readTemperature();
   allData.Humidity = bme.readHumidity();
   allData.EspId = ESP.getChipId();
   allData.BatteryLevel = "100";
+
+}
+
+bool SentData() {
+
+#ifdef DEBUG
+  Serial.print("connecting to ");
+  Serial.println(host);
+#endif
+  // Use WiFiClient class to create TCP connections
+  static WiFiClient client;
+  int tries = 5;
+
+  while (!client.connect(host, HOSTPORT) && tries) {
+#ifdef DEBUG
+    Serial.println("connection failed");
+#endif
+
+    tries --;
+
+  }
+
+  if (tires <= 0)
+    return false;
+
+
+  GatherData(); //checking all the sensors
   
+  // We now create a URI for the request
+  String url = "/public/php/pushData.php?";
+  url += "unic_id=" + allData.EspId ;
+  url += "&temperature=" + allData.Temperature;
+  url += "&humidity=" + allData.Humidity;
+  url += "&battery=" + allData.BatteryLevel;
+
+#ifdef DEBUG
+  Serial.print("Requesting URL: ");
+  Serial.println(url);
+#endif
+
+  // This will send the request to the server
+  client.print(String("GET ") + url + " HTTP/1.1\r\n" + "Host: " + host + "\r\n\r\n") ;
+
+  unsigned long timeout = millis();
+  while (client.available() == 0) {
+    if (millis() - timeout > 5000) {
+      Serial.println(">>> Client Timeout !");
+      client.stop();
+      return false;
+    }
+  }
+
+#ifdef DEBUG
+  // Read all the lines of the reply from server and print them to Serial
+  while (client.available()) {
+    String line = client.readStringUntil('\r');
+    Serial.print(line);
+  }
+
+  Serial.println();
+  Serial.println("closing connection");
+#endif
+
 }
 
 
 void triggerIftttEvent() {
   if (ifttt.triggerEvent(EVENT_NAME, ssid, ipAddress)) {
-    #ifdef DEBUG
+#ifdef DEBUG
     Serial.println("IFTTT Successfully sent");
-    #endif
+#endif
   }
 }
 
 void sendTelegramMessage() {
   String message = "someone is trying to steal your hive!";
   if (bot.sendMessage(CHAT_ID, message, "Markdown")) {
-    #ifdef DEBUG
+#ifdef DEBUG
     Serial.println("TELEGRAM Successfully sent");
-    #endif
+#endif
   }
 
 }
@@ -109,11 +172,11 @@ void sendTelegramMessage() {
 
 bool SecProblem() {
 
-  
-  #ifdef DEBUG
+
+#ifdef DEBUG
   Serial.println("stariting");
-  #endif
-  
+#endif
+
   static int SamplesSum;
   static unsigned int firstOne;
   static  unsigned int mid ;
@@ -143,13 +206,13 @@ bool SecProblem() {
 
   SamplesSum = abs( SamplesSum - medianOfThree);
 
-  #ifdef DEBUG
+#ifdef DEBUG
   Serial.println(SamplesSum);
-  #endif
+#endif
   return (SamplesSum > DEFAULTMAX );
 
 }
 
 
 
-#endif 
+#endif
