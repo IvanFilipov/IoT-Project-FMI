@@ -66,10 +66,11 @@ void setup() {
 
 void loop() {
 
+  UPdate();
   delay(2000);
   if ( SecProblem() ) {
     triggerIftttEvent();
-    sendTelegramMessage();
+    sendTelegramMessage("someone is trying to steal your hive!");
     for (;;);
   }
 }

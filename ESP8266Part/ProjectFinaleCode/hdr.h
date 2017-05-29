@@ -5,9 +5,14 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
-
 // SSL client needed for both security libraries
 WiFiClientSecure client;
+
+//update ---------------------------------------------
+
+#include <ESP8266HTTPClient.h>
+#include <ESP8266httpUpdate.h>
+
 
 //------- WiFi Settings -------
 const char* ssid = "AndroidHotspo";       // your network SSID (name)
@@ -15,6 +20,7 @@ const char* password = "**********************";  // your network key
 const char* host = "88.87.1.226"; //where the server is
 #define HOSTPORT 80
 
+#define DEBUG
 
 //security -----------------------------------------------
 #include <UniversalTelegramBot.h>
@@ -32,7 +38,7 @@ IFTTTMaker ifttt(KEY, client);
 UniversalTelegramBot bot(BOT_TOKEN, client);
 
 void triggerIftttEvent();
-void sendTelegramMessage();
+void sendTelegramMessage(const char*);
 bool SecProblem();
 
 
@@ -44,6 +50,7 @@ String ipAddress = "";
 #define DEFAULTMAX 50
 
 const int xpin = A0; // where the analog pin is
+const char* FilePath = "/public/NewVersion.bin";
 
 struct {
 
@@ -76,19 +83,50 @@ Adafruit_BME280 bme; // I2C
 
 //function realizations ----------------------------------------
 
+void UPdate(){
+
+#ifdef DEBUG
+    Serial.println("UPDATING");
+#endif
+
+    
+    if((WiFi.status() == WL_CONNECTED)) {
+
+        t_httpUpdate_return ret = ESPhttpUpdate.update(host,HOSTPORT,FilePath);
+
+
+#ifdef DEBUG
+        switch(ret) {
+            case HTTP_UPDATE_FAILED:
+                Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+                break;
+
+            case HTTP_UPDATE_NO_UPDATES:
+                Serial.println("HTTP_UPDATE_NO_UPDATES");
+                break;
+
+            case HTTP_UPDATE_OK:
+                Serial.println("HTTP_UPDATE_OK");
+                break;
+        }
+#endif   
+        if(ret == HTTP_UPDATE_OK)
+            sendTelegramMessage("UPDATE complete!");
+    }
+}
+
+
 
 void GatherData() {
-
-  Serial.println(bme.readTemperature());
-
+  
   allData.Temperature = bme.readTemperature();
   allData.Humidity = bme.readHumidity();
   allData.EspId = ESP.getChipId();
-  allData.BatteryLevel = "100";
+  allData.BatteryLevel = "50";
 
 }
 
-bool SentData() {
+bool SendData() {
 
 #ifdef DEBUG
   Serial.print("connecting to ");
@@ -107,13 +145,13 @@ bool SentData() {
 
   }
 
-  if (tires <= 0)
+  if (tries <= 0)
     return false;
 
 
   GatherData(); //checking all the sensors
   
-  // We now create a URI for the request
+  //request URI
   String url = "/public/php/pushData.php?";
   url += "unic_id=" + allData.EspId ;
   url += "&temperature=" + allData.Temperature;
@@ -148,6 +186,8 @@ bool SentData() {
   Serial.println("closing connection");
 #endif
 
+  return true;
+
 }
 
 
@@ -159,8 +199,10 @@ void triggerIftttEvent() {
   }
 }
 
-void sendTelegramMessage() {
-  String message = "someone is trying to steal your hive!";
+void sendTelegramMessage(const char* msg) {
+  
+  String message = msg;
+  
   if (bot.sendMessage(CHAT_ID, message, "Markdown")) {
 #ifdef DEBUG
     Serial.println("TELEGRAM Successfully sent");
