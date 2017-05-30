@@ -12,6 +12,31 @@ var espController = (function() {
             });
     }
 
+    function addEspToCompare() {
+        $("#select-esp-to-comp").click((ev) => {
+            if($('#select-esp-to-comp option').length <= 1)
+            {
+                Promise.all([dataService.allEspsToCompare()])
+                .then(function([data]) {
+                    $.each(data.result.ESPS, function(index, esp) { // Iterates through a collection
+                        $("#select-esp-to-comp").append( // Append an object to the inside of the select box
+                            $("<option></option>") // Yes you can do this.
+                                .text(esp.name + " by " + esp.username)
+                                .val(esp.name)
+                                .attr("data-unicid", esp.unic_id)
+                        );
+                    });
+
+                });
+            }
+        });
+        // $('.select-esp-to-comp').change(function(ev){
+        //             //do somthing
+        //             console.log(ev);
+        //     $('.select-esp-to-comp').empty().append("<option selected disabled>chose ESP to compare</option>")
+        // });
+    }
+
     function add() {
         $(".btn-add-ESP").on("click", (ev) => {
             var esp = {
@@ -117,6 +142,7 @@ var espController = (function() {
 
     return {
         all: all,
+        addEspToCompare: addEspToCompare,
         add: add,
         remove: remove,
         rename: rename,

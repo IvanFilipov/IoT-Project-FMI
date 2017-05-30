@@ -92,7 +92,7 @@ WHERE ESPS.public = TRUE";
 	}
 	public function getAllByLogin($username)
 	{
-		$query = "SELECT name FROM ESPS WHERE ESPS.username = :username OR public = TRUE";
+		$query = "SELECT name, username, unic_id FROM ESPS WHERE ESPS.username = :username OR public = TRUE";
 		$statement = $this->db->connection->prepare($query);
 		$statement->bindParam(":username",$username);
 		$statement->execute();

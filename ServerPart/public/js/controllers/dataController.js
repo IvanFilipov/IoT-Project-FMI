@@ -16,7 +16,7 @@ var dataController = (function() {
 
         $(function () {
             let currentDate = new Date();
-            let days = 47;
+            let days = 21;
             let offset = days * 24 * 60 * 60 * 1000;
             $('#datetimepickerFrom').datetimepicker({
                 defaultDate: (currentDate - offset),
@@ -25,6 +25,12 @@ var dataController = (function() {
 
             $('#datetimepickerTo').datetimepicker({
                 defaultDate: currentDate,
+                format: 'MM/DD/Y HH:mm'
+                // "setDate": new Date()
+                // locale: 'en'
+            });
+            $('#datetimepickerFromSecondESP').datetimepicker({
+                defaultDate: (currentDate - offset),
                 format: 'MM/DD/Y HH:mm'
                 // "setDate": new Date()
                 // locale: 'en'
@@ -41,6 +47,12 @@ var dataController = (function() {
             let espName = $(this).parent().data('espname') || $(this).data('espname');
             let title = "ESP " + espName;
             $('#infoModal .modal-title').text(title);
+            $('#infoModal').on('hidden.bs.modal', function () {
+                $(".temp_graphic_second").addClass("hidden");
+                $(".humidity_graphic_second").addClass("hidden");
+                $(".comp_temp_graphic").addClass("hidden");
+                $(".comp_humidity_graphic").addClass("hidden");
+            })
 
             let esp = {
                 unic_id : unic_id,
@@ -51,14 +63,15 @@ var dataController = (function() {
             dataService.getEspData(esp).then(function(response) {
                 let data = response.result.data;
                 data = data.slice();
-                proccessTemperature(data);
-                proccessHumidity(data);
+                // proccessTemperature(data);
+                // proccessHumidity(data);
+                proccessDate(data,".temp_graphic",".humidity_graphic")
             });
             $(".btn-show-data").click(function(){ 
-                unic_id = self.parent().data('unicid') || self.data('unicid');
-                from = spliter($("#datetimepickerFrom").find("input").val());
-                to = spliter($("#datetimepickerTo").find("input").val());
-                esp = {
+                let unic_id = self.parent().data('unicid') || self.data('unicid');
+                let from = spliter($("#datetimepickerFrom").find("input").val());
+                let to = spliter($("#datetimepickerTo").find("input").val());
+                let esp = {
                     unic_id : unic_id,
                     from : from,
                     to : to
@@ -68,12 +81,52 @@ var dataController = (function() {
                     let data = response.result.data;
                     data = data.slice();
                     // console.log(data);
-                    proccessTemperature(data);
-                    proccessHumidity(data);
+                    // proccessTemperature(data);
+                    // proccessHumidity(data);
+
+                    proccessDate(data,".temp_graphic",".humidity_graphic")
 
                 });
             });
+
+
+            $(".btn-show-second-data").click(function(){ 
+                let unic_id = self.parent().data('unicid') || self.data('unicid');
+                unic_id = $('#select-esp-to-comp option:selected').data("unicid");
+                let from = spliter($("#datetimepickerFrom").find("input").val());
+                let to = spliter($("#datetimepickerTo").find("input").val());
+                let razlika = differenceTime(to, from);
+                let fromSecond = spliter($("#datetimepickerFromSecondESP").find("input").val());
+                let toSecond = sumTime(fromSecond, razlika);
+
+                // $(".hours-num").text("")
+                esp = {
+                    unic_id : unic_id,
+                    from : fromSecond,
+                    to : toSecond
+                }
+                if(!esp.unic_id) 
+                {
+                    toastr.error('Chose ESP', 'Bad!');
+                    return;
+                }
+                $(".temp_graphic_second").removeClass("hidden");
+                $(".humidity_graphic_second").removeClass("hidden");
+                $(".comp_temp_graphic").removeClass("hidden");
+                $(".comp_humidity_graphic").removeClass("hidden");
+                dataService.getEspData(esp).then(function(response) {
+                    let data = response.result.data;
+                    data = data.slice();
+                    // console.log(data);
+                    // proccessTemperature(data);
+                    // proccessHumidity(data);
+                    proccessDate(data,".temp_graphic_second",".humidity_graphic_second")
+                });
+
+            });
         });
+
+        espController.addEspToCompare();
     }
     function spliter(datetime){
         let dateAndTime = datetime.split(" ");
@@ -86,6 +139,53 @@ var dataController = (function() {
             hour: time[0],
             minute: time[1],
         }
+    }
+    function differenceTime(time1, time2)
+    {
+        let date1 = new Date(time1.year, time1.month, time1.day, 
+            time1.hour, time1.minute);
+        let date2 = new Date(time2.year, time2.month, time2.day, 
+            time2.hour, time2.minute);
+        let diff = new Date(date1.getTime() - date2.getTime());
+        // let diff = date1.getTime() - date2.getTime();
+        // console.log(date1 - date2);
+        return {
+            month: (diff.getMonth()).toString(),
+            day: (diff.getDate()).toString(),
+            year: (diff.getFullYear()).toString(),
+            hour: (diff.getHours()).toString(),
+            minute: (diff.getMinutes()).toString()
+        }
+        // return {
+        //     month: (parseInt(time1.month) - parseInt(time2.month)).toString(),
+        //     day: (parseInt(time1.day) - parseInt(time2.day)).toString(),
+        //     year: (parseInt(time1.year) - parseInt(time2.year)).toString(),
+        //     hour: (parseInt(time1.hour) - parseInt(time2.hour)).toString(),
+        //     minute: (parseInt(time1.minute) - parseInt(time2.minute)).toString(),
+        // }
+    }
+    function sumTime(time1, time2)
+    {
+        let date1 = new Date(time1.year, time1.month, time1.day, 
+            time1.hour, time1.minute);
+        let date2 = new Date(time2.year, time2.month, time2.day, 
+            time2.hour, time2.minute);
+        // let sum = date1.getTime() + date2.getTime();
+        let sum = new Date(date1.getTime() + date2.getTime());
+        return {
+            month: (sum.getMonth()).toString(),
+            day: (sum.getDate()).toString(),
+            year: (sum.getFullYear()).toString(),
+            hour: (sum.getHours()).toString(),
+            minute: (sum.getMinutes()).toString()
+        }
+        // return {
+        //     month: (parseInt(time1.month) + parseInt(time2.month)).toString(),
+        //     day: (parseInt(time1.day) + parseInt(time2.day)).toString(),
+        //     year: (parseInt(time1.year) + parseInt(time2.year)).toString(),
+        //     hour: (parseInt(time1.hour) + parseInt(time2.hour)).toString(),
+        //     minute: (parseInt(time1.minute) + parseInt(time2.minute)).toString(),
+        // }
     }
 
     // var svg = d3.select("svg");
@@ -142,9 +242,15 @@ var dataController = (function() {
     //           .text("Price ($)");
     //     });
     // }
-    function proccessTemperature(data) {
-        let widthPixels = $(".temp_graphic").width();
-        let heightPixels = $(".temp_graphic").height();
+    function proccessDate(data, d3selectorTemp, d3selectorHumidity)
+    {
+        proccessTemperature(data, d3selectorTemp);
+        proccessHumidity(data, d3selectorHumidity);
+    }
+    function proccessTemperature(data, d3selectorTemp) {
+        // let widthPixels = $(".temp_graphic").width();
+        let widthPixels = $(d3selectorTemp).width();
+        let heightPixels = $(d3selectorTemp).height();
 
         let margin = {top: 20, right: 20, bottom: 75, left: 50},
             width = widthPixels - margin.left - margin.right,
@@ -173,8 +279,8 @@ var dataController = (function() {
             .y1(function(d) { return y(d.close); });
 
         // var svg = d3.select("body").append("svg")
-        d3.select(".temp_graphic svg").remove();
-        let svg = d3.select(".temp_graphic")
+        d3.select(d3selectorTemp + " svg").remove();
+        let svg = d3.select(d3selectorTemp)
             .append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
@@ -215,9 +321,9 @@ var dataController = (function() {
                 .text("Temperature");
     }
 
-    function proccessHumidity(data) {
-        let widthPixels = $(".humidity_graphic").width();
-        let heightPixels = $(".humidity_graphic").height();
+    function proccessHumidity(data, d3selectorHumidity) {
+        let widthPixels = $(d3selectorHumidity).width();
+        let heightPixels = $(d3selectorHumidity).height();
 
         let margin = {top: 20, right: 20, bottom: 75, left: 50},
             width = widthPixels - margin.left - margin.right,
@@ -246,8 +352,8 @@ var dataController = (function() {
             .y1(function(d) { return y(d.close); });
 
         // var svg = d3.select("body").append("svg")
-        d3.select(".humidity_graphic svg").remove();
-        let svg = d3.select(".humidity_graphic")
+        d3.select(d3selectorHumidity + " svg").remove();
+        let svg = d3.select(d3selectorHumidity)
             .append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)

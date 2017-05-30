@@ -34,56 +34,81 @@
             </table>
 
 
-  <div class="modal fade" id="infoModal" role="dialog">
-    <div class="modal-dialog modal-lg">
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Modal Header</h4>
-        </div>
-        <div class="modal-body">
-        <div class="container">
-            <div class="row">
-                <div class='col-sm-3'>
-                    <div class="form-group">
-                        <div class='input-group date form_datetime' id='datetimepickerFrom'>
-                            <input type='text' class="form-control" />
-                            <span class="input-group-addon">
-                                <span class="glyphicon glyphicon-calendar"></span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class='col-sm-3'>
-                    <div class="form-group">
-                        <div class='input-group date form_datetime' id='datetimepickerTo'>
-                            <input type='text' class="form-control" />
-                            <span class="input-group-addon">
-                                <span class="glyphicon glyphicon-calendar"></span>
-                            </span>
-                            <!-- <input type="time" name=""> -->
-                        </div>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-show-data col-sm-1">Show</button>
-            </div>
-            <div class="row">
-                <div class='visualisation temp_graphic'>
-                    <!-- <svg width="500" height="300" class="visualisationContainer"></svg> -->
-                </div>
-                <div class='visualisation humidity_graphic'>
-                </div>
-            </div>
-        </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
+              <div class="modal fade" id="infoModal" role="dialog">
+                <div class="modal-dialog modal-lg">
+                
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Modal Header</h4>
+                    </div>
+                    <div class="modal-body">
+
+<div class="container">
+    <div class="row">
+        <div class='col-sm-3'>
+            <div class="form-group">
+                <div class='input-group date form_datetime' id='datetimepickerFrom'>
+                    <input type='text' class="form-control" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-3'>
+            <div class="form-group">
+                <div class='input-group date form_datetime' id='datetimepickerTo'>
+                    <input type='text' class="form-control" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                    <!-- <input type="time" name=""> -->
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-show-data col-sm-1">Show</button>
+
+    </div>
+    <div class="row">
+        <div class='visualisation temp_graphic'>
+            <!-- <svg width="500" height="300" class="visualisationContainer"></svg> -->
+        </div>
+        <div class='visualisation humidity_graphic'>
+        </div>
+    </div>
+    <div class="row">
+        <div class='col-sm-3'>
+            <div class="form-group">
+                <div class='input-group date form_datetime' id='datetimepickerFromSecondESP'>
+                    <input type='text' class="form-control" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="col-md-2 h5 hours-num">time</div> -->
+        <select class="col-sm-3 selectpicker" id="select-esp-to-comp">
+            <option selected disabled>chose ESP to compare</option>
+        </select>  
+        <button type="button" class="btn btn-show-second-data col-sm-1">Show</button> 
+    </div>
+    <div class="row">
+        <div class='visualisation hidden temp_graphic_second'>
+            <!-- <svg width="500" height="300" class="visualisationContainer"></svg> -->
+        </div>
+        <div class='visualisation hidden humidity_graphic_second'>
+        </div>
+        <div class='visualisation hidden comp_temp_graphic'>
+        </div>
+        <div class='visualisation hidden comp_humidity_graphic'>
+        </div>
+    </div>
+
+</div>
 
             {{else}}
             <h5>No ESPS</h5>

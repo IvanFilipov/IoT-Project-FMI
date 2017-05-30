@@ -56,6 +56,9 @@ var dataService = (function(){
     }
 
     function allEsps() { 
+        return requester.get("php/book.php");
+    }
+    function allEspsToCompare() { 
         let options;
         if(isLoggedIn())   
         {
@@ -66,7 +69,7 @@ var dataService = (function(){
                 }
             };
         }
-        return requester.get("php/book.php", options);
+        return requester.get("php/getAllEspsByLogedIn.php", options);
     }
 
     function addESP(esp) {
@@ -124,6 +127,7 @@ var dataService = (function(){
         getUsers,
         getUser,
         allEsps,
+        allEspsToCompare,
         addESP,
         removeESP,
         renameESP,
