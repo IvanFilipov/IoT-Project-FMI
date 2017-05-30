@@ -16,7 +16,7 @@ WiFiClientSecure client;
 
 //------- WiFi Settings -------
 const char* ssid = "AndroidHotspo";       // your network SSID (name)
-const char* password = "**********************";  // your network key
+const char* password = "vanaka11";  // your network key
 const char* host = "88.87.1.226"; //where the server is
 #define HOSTPORT 80
 
@@ -83,46 +83,73 @@ Adafruit_BME280 bme; // I2C
 
 //function realizations ----------------------------------------
 
-void UPdate(){
+bool CheckWordFromChat(const char* Word) {
 
-#ifdef DEBUG
-    Serial.println("UPDATING");
-#endif
+  int num = bot.getUpdates(bot.last_message_received + 1); // Read new messages
 
-    
-    if((WiFi.status() == WL_CONNECTED)) {
+  if (num <= 0)
+    return false;
 
-        t_httpUpdate_return ret = ESPhttpUpdate.update(host,HOSTPORT,FilePath);
-
-
-#ifdef DEBUG
-        switch(ret) {
-            case HTTP_UPDATE_FAILED:
-                Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
-                break;
-
-            case HTTP_UPDATE_NO_UPDATES:
-                Serial.println("HTTP_UPDATE_NO_UPDATES");
-                break;
-
-            case HTTP_UPDATE_OK:
-                Serial.println("HTTP_UPDATE_OK");
-                break;
-        }
-#endif   
-        if(ret == HTTP_UPDATE_OK)
-            sendTelegramMessage("UPDATE complete!");
+  Serial.println("message received");
+  for (int i = 0 ; i < num ; i++) {
+    if (bot.messages[i].text == Word) {
+      String ans = Word;
+      ans += " successully done !";
+      bot.sendMessage(CHAT_ID, ans);
+      return true;
     }
+  }
+
+  return false;
 }
 
 
 
+
+void UPdate() {
+
+#ifdef DEBUG
+  Serial.println("UPDATING");
+#endif
+
+
+  if ((WiFi.status() == WL_CONNECTED)) {
+
+    t_httpUpdate_return ret = ESPhttpUpdate.update(host, HOSTPORT, FilePath);
+
+
+#ifdef DEBUG
+    switch (ret) {
+      case HTTP_UPDATE_FAILED:
+        Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+        break;
+
+      case HTTP_UPDATE_NO_UPDATES:
+        Serial.println("HTTP_UPDATE_NO_UPDATES");
+        break;
+
+      case HTTP_UPDATE_OK:
+        Serial.println("HTTP_UPDATE_OK");
+        break;
+    }
+#endif
+    if (ret == HTTP_UPDATE_OK)
+      sendTelegramMessage("UPDATE complete!");
+  }
+}
+
+String GetBatteryLevel() {
+
+  return "100";
+
+}
+
 void GatherData() {
-  
+
   allData.Temperature = bme.readTemperature();
   allData.Humidity = bme.readHumidity();
   allData.EspId = ESP.getChipId();
-  allData.BatteryLevel = "50";
+  allData.BatteryLevel = GetBatteryLevel();
 
 }
 
@@ -150,7 +177,7 @@ bool SendData() {
 
 
   GatherData(); //checking all the sensors
-  
+
   //request URI
   String url = "/public/php/pushData.php?";
   url += "unic_id=" + allData.EspId ;
@@ -190,6 +217,14 @@ bool SendData() {
 
 }
 
+void BackUpInEEPROM(){
+  //TODO
+}
+
+void SendFromEEPROM(){
+
+  //TODO
+}
 
 void triggerIftttEvent() {
   if (ifttt.triggerEvent(EVENT_NAME, ssid, ipAddress)) {
@@ -200,9 +235,9 @@ void triggerIftttEvent() {
 }
 
 void sendTelegramMessage(const char* msg) {
-  
+
   String message = msg;
-  
+
   if (bot.sendMessage(CHAT_ID, message, "Markdown")) {
 #ifdef DEBUG
     Serial.println("TELEGRAM Successfully sent");
@@ -253,6 +288,47 @@ bool SecProblem() {
 #endif
   return (SamplesSum > DEFAULTMAX );
 
+}
+
+bool SecON = true;
+long long beginTime; //= millis() / 1000;
+long long endTime; //= beginTime + 60;
+
+bool SecurityRoutineProblem() {
+
+  //Serial.println("new episode!");
+  
+  beginTime = millis() / 1000;
+  endTime = beginTime + 600;
+  
+  while (beginTime < endTime) {
+
+    if (SecON && CheckWordFromChat("--off")) {
+
+      SecON = false;
+      //Serial.println("done");
+
+    }
+
+    if (!SecON && CheckWordFromChat("--on")) {
+
+      SecON = true;
+      //Serial.println("done");
+
+    }
+
+    if (SecON && SecProblem() ) {
+      triggerIftttEvent();
+      sendTelegramMessage("someone is trying to steal your hive!");
+      return true;
+    }
+
+    Serial.println("cycleDone");
+    beginTime += millis() / 1000;
+    
+  }
+
+  return false;
 }
 
 

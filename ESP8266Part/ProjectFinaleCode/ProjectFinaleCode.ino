@@ -9,7 +9,7 @@ void setup() {
 #endif
 
 
-//wifi setup 
+  //wifi setup
 
   // Set WiFi to station mode and disconnect from an AP if it was Previously
   // connected
@@ -36,41 +36,49 @@ void setup() {
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
 #endif
-  
+
   IPAddress ip = WiFi.localIP();
-  
+
 #ifdef DEBUG
   Serial.println(ip);
 #endif
   ipAddress = ip.toString();
 
-//temp setup
+  //temp setup
 
-    Wire.begin(D6,D7);
-    bool status; 
-    status = bme.begin(0x76);
+  Wire.begin(D6, D7);
+  bool status;
+  status = bme.begin(0x76);
 
 #ifdef DEBUG
-    if (!status) {
-        Serial.println("Could not find a valid BME280 sensor, check wiring!");
-    }
+  if (!status) {
+    Serial.println("Could not find a valid BME280 sensor, check wiring!");
+  }
 #endif
 
-  delay(2000); //bme needs some time 
-  
-  if(SendData())
-     Serial.println("successfully sent !");
-  
- 
+  delay(2000); //bme needs some time
+
+  //if(SendData())
+  // Serial.println("successfully sent !");
+
+
+
 }
+
 
 void loop() {
 
-  UPdate();
+  Serial.println("new episode");
+  //UPdate();
   delay(2000);
-  if ( SecProblem() ) {
-    triggerIftttEvent();
-    sendTelegramMessage("someone is trying to steal your hive!");
-    for (;;);
+  if(SecurityRoutineProblem()){
+    
+    ///TODO
   }
+
+  if(SendData())
+      SendFromEEPROM();
+  else
+      BackUpInEEPROM();
+  
 }
