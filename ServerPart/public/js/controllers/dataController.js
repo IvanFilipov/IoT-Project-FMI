@@ -39,11 +39,6 @@ var dataController = (function() {
 
         $(".btn-info").click(function(){ 
             let self = $(this);
-            let unic_id = self.parent().data('unicid') || self.data('unicid');
-
-            let from = spliter($("#datetimepickerFrom").find("input").val());
-            let to = spliter($("#datetimepickerTo").find("input").val());
-
             let espName = $(this).parent().data('espname') || $(this).data('espname');
             let title = "ESP " + espName;
             $('#infoModal .modal-title').text(title);
@@ -53,81 +48,69 @@ var dataController = (function() {
                 $(".comp_temp_graphic").addClass("hidden");
                 $(".comp_humidity_graphic").addClass("hidden");
             })
+            printDataFirstESP.call(self);
 
-            let esp = {
-                unic_id : unic_id,
-                from : from,
-                to : to
-            }
-
-            dataService.getEspData(esp).then(function(response) {
-                let data = response.result.data;
-                data = data.slice();
-                // proccessTemperature(data);
-                // proccessHumidity(data);
-                proccessDate(data,".temp_graphic",".humidity_graphic")
-            });
             $(".btn-show-data").click(function(){ 
-                let unic_id = self.parent().data('unicid') || self.data('unicid');
-                let from = spliter($("#datetimepickerFrom").find("input").val());
-                let to = spliter($("#datetimepickerTo").find("input").val());
-                let esp = {
-                    unic_id : unic_id,
-                    from : from,
-                    to : to
-                }
-
-                dataService.getEspData(esp).then(function(response) {
-                    let data = response.result.data;
-                    data = data.slice();
-                    // console.log(data);
-                    // proccessTemperature(data);
-                    // proccessHumidity(data);
-
-                    proccessDate(data,".temp_graphic",".humidity_graphic")
-
-                });
+                printDataFirstESP.call(self);
             });
 
 
             $(".btn-show-second-data").click(function(){ 
-                let unic_id = self.parent().data('unicid') || self.data('unicid');
-                unic_id = $('#select-esp-to-comp option:selected').data("unicid");
-                let from = spliter($("#datetimepickerFrom").find("input").val());
-                let to = spliter($("#datetimepickerTo").find("input").val());
-                let razlika = differenceTime(to, from);
-                let fromSecond = spliter($("#datetimepickerFromSecondESP").find("input").val());
-                let toSecond = sumTime(fromSecond, razlika);
-
-                // $(".hours-num").text("")
-                esp = {
-                    unic_id : unic_id,
-                    from : fromSecond,
-                    to : toSecond
-                }
-                if(!esp.unic_id) 
-                {
-                    toastr.error('Chose ESP', 'Bad!');
-                    return;
-                }
-                $(".temp_graphic_second").removeClass("hidden");
-                $(".humidity_graphic_second").removeClass("hidden");
-                $(".comp_temp_graphic").removeClass("hidden");
-                $(".comp_humidity_graphic").removeClass("hidden");
-                dataService.getEspData(esp).then(function(response) {
-                    let data = response.result.data;
-                    data = data.slice();
-                    // console.log(data);
-                    // proccessTemperature(data);
-                    // proccessHumidity(data);
-                    proccessDate(data,".temp_graphic_second",".humidity_graphic_second")
-                });
-
+                printDataSecondESP.call(self);
             });
         });
 
         espController.addEspToCompare();
     }
+
+    function printDataFirstESP()
+    {
+        let unic_id = this.parent().data('unicid') || this.data('unicid');
+        let from = spliter($("#datetimepickerFrom").find("input").val());
+        let to = spliter($("#datetimepickerTo").find("input").val());
+        let esp = {
+            unic_id : unic_id,
+            from : from,
+            to : to
+        }
+        dataService.getEspData(esp).then(function(response) {
+            let data = response.result.data;
+            data = data.slice();
+            proccessDate(data,".temp_graphic",".humidity_graphic")
+        });
+    }    
+    function printDataSecondESP()
+    {
+        let unic_id = this.parent().data('unicid') || this.data('unicid');
+        unic_id = $('#select-esp-to-comp option:selected').data("unicid");
+        let from = spliter($("#datetimepickerFrom").find("input").val());
+        let to = spliter($("#datetimepickerTo").find("input").val());
+        let razlika = differenceTime(to, from);
+        let fromSecond = spliter($("#datetimepickerFromSecondESP").find("input").val());
+        let toSecond = sumTime(fromSecond, razlika);
+
+        // $(".hours-num").text("")
+        esp = {
+            unic_id : unic_id,
+            from : fromSecond,
+            to : toSecond
+        }
+        if(!esp.unic_id) 
+        {
+            toastr.error('Chose ESP', 'Bad!');
+            return;
+        }
+        $(".temp_graphic_second").removeClass("hidden");
+        $(".humidity_graphic_second").removeClass("hidden");
+        $(".comp_temp_graphic").removeClass("hidden");
+        $(".comp_humidity_graphic").removeClass("hidden");
+        dataService.getEspData(esp).then(function(response) {
+            let data = response.result.data;
+            data = data.slice();
+            proccessDate(data,".temp_graphic_second",".humidity_graphic_second")
+        });
+    }
+
     function spliter(datetime){
         let dateAndTime = datetime.split(" ");
         let date = dateAndTime[0].split("/");
