@@ -57,28 +57,31 @@ void setup() {
 #endif
 
   delay(2000); //bme needs some time
-
-  //if(SendData())
-  // Serial.println("successfully sent !");
-
-
-
 }
 
 
 void loop() {
 
-  Serial.println("new episode");
+  //Serial.println("new episode");
   //UPdate();
   delay(2000);
-  if(SecurityRoutineProblem()){
-    
+
+#ifdef SECURITY_MODULE
+  if (SecurityRoutineProblem()) {
+
     ///TODO
   }
+#endif
 
-  if(SendData())
-      SendFromEEPROM();
+  if (SendData())
+    SendFromEEPROM();
   else
-      BackUpInEEPROM();
-  
+    BackUpInEEPROM();
+
+#ifndef SECURITY_MODULE
+
+  ESP.deepSleep(SLEEPTIME);
+
+#endif
+
 }

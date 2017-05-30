@@ -1,6 +1,10 @@
 #ifndef _HDR
 #define _HDR
 
+//---------------compile properities
+#define DEBUG 
+#define SECURITY_MODULE
+
 //wifi -----------------------------------------------
 
 #include <ESP8266WiFi.h>
@@ -19,8 +23,6 @@ const char* ssid = "AndroidHotspo";       // your network SSID (name)
 const char* password = "vanaka11";  // your network key
 const char* host = "88.87.1.226"; //where the server is
 #define HOSTPORT 80
-
-#define DEBUG
 
 //security -----------------------------------------------
 #include <UniversalTelegramBot.h>
@@ -44,7 +46,11 @@ bool SecProblem();
 
 //helpers -----------------------------------------------
 #include<math.h>
+
 String ipAddress = "";
+
+
+#define SLEEPTIME 600000
 
 #define NSAMPLES 10
 #define DEFAULTMAX 50
@@ -117,6 +123,8 @@ void UPdate() {
 
     t_httpUpdate_return ret = ESPhttpUpdate.update(host, HOSTPORT, FilePath);
 
+      if (ret == HTTP_UPDATE_OK)
+          sendTelegramMessage("UPDATE complete!");
 
 #ifdef DEBUG
     switch (ret) {
@@ -133,8 +141,6 @@ void UPdate() {
         break;
     }
 #endif
-    if (ret == HTTP_UPDATE_OK)
-      sendTelegramMessage("UPDATE complete!");
   }
 }
 
@@ -323,7 +329,9 @@ bool SecurityRoutineProblem() {
       return true;
     }
 
+#ifdef DEBUG
     Serial.println("cycleDone");
+#endif
     beginTime += millis() / 1000;
     
   }
