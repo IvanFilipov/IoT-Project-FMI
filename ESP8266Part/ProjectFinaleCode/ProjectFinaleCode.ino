@@ -8,6 +8,16 @@ void setup() {
   Serial.begin(115200);
 #endif
 
+  //backup setup
+  EEPROM.begin(MAXLEN);
+
+#ifdef BECKUPINIT
+  for (int i = 0; i < MAXLEN; i++)
+    EEPROM.write(i, 0);
+
+  EEPROM.commit();
+#endif
+  _EspId = ESP.getChipId();
 
   //wifi setup
 
@@ -59,17 +69,19 @@ void setup() {
   delay(2000); //bme needs some time
 }
 
-
 void loop() {
 
-  //Serial.println("new episode");
-  //UPdate();
+  UPdate();
   delay(2000);
 
 #ifdef SECURITY_MODULE
   if (SecurityRoutineProblem()) {
 
-    ///TODO
+   while(!CheckWordFromChat("--unlock")){
+      delay(2000);
+   }
+   sendTelegramMessage("unlocked!");
+   
   }
 #endif
 

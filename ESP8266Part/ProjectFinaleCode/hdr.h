@@ -2,8 +2,13 @@
 #define _HDR
 
 //---------------compile properities
-#define DEBUG 
+#define DEBUG
 #define SECURITY_MODULE
+#define BECKUPINIT
+
+//backup
+#include<EEPROM.h> 
+#define MAXLEN 4096
 
 //wifi -----------------------------------------------
 
@@ -48,6 +53,7 @@ bool SecProblem();
 #include<math.h>
 
 String ipAddress = "";
+String _EspId;// = ESP.getChipId(); 
 
 
 #define SLEEPTIME 600000
@@ -57,6 +63,7 @@ String ipAddress = "";
 
 const int xpin = A0; // where the analog pin is
 const char* FilePath = "/public/NewVersion.bin";
+ADC_MODE(ADC_VCC); // needed for volt measuring
 
 struct {
 
@@ -123,8 +130,8 @@ void UPdate() {
 
     t_httpUpdate_return ret = ESPhttpUpdate.update(host, HOSTPORT, FilePath);
 
-      if (ret == HTTP_UPDATE_OK)
-          sendTelegramMessage("UPDATE complete!");
+    if (ret == HTTP_UPDATE_OK)
+      sendTelegramMessage("UPDATE complete!");
 
 #ifdef DEBUG
     switch (ret) {
@@ -146,15 +153,30 @@ void UPdate() {
 
 String GetBatteryLevel() {
 
-  return "100";
+  static int vcc;
+  vcc  = ESP.getVcc();
 
+  if (vcc >= 2990)
+    return "100";
+
+  if(vcc >= 2700)
+    return "75";
+
+  if(vcc >= 2500)
+    return "50";
+
+  if(vcc >= 2300)
+    return "25";      
+
+  return "1";
+  
 }
 
 void GatherData() {
 
   allData.Temperature = bme.readTemperature();
   allData.Humidity = bme.readHumidity();
-  allData.EspId = ESP.getChipId();
+  allData.EspId = _EspId;
   allData.BatteryLevel = GetBatteryLevel();
 
 }
@@ -223,13 +245,72 @@ bool SendData() {
 
 }
 
-void BackUpInEEPROM(){
-  //TODO
+void BackUpInEEPROM() {
+  
+  int offset = 0;
+  signed char T = -1; //temp 0 ; 120 
+  byte H = 0xFF; //humidity 0 - 100
+  byte B = 0xFF; //battery 0 - 100
+
+  while(true){
+
+     T = EEPROM.read(offset++);
+     H = EEPROM.read(offset++);
+     B = EEPROM.read(offset++);
+
+     if(T == B && B == H && H == 0) //empty slot
+        break;
+  }
+
+  if(offset >= 3)
+    offset -= 3;
+
+  if(offset >= MAXLEN - 3)
+    offset == 0;  
+
+  T = (signed char)atoi(allData.Temperature.c_str());
+  H = (byte)atoi(allData.Humidity.c_str());
+  B = (byte)atoi(allData.BatteryLevel.c_str());
+
+  EEPROM.write(offset++ , T);
+  EEPROM.write(offset++ , H);
+  EEPROM.write(offset++ , B);
+
+  EEPROM.commit();
+  
 }
 
-void SendFromEEPROM(){
+void SendFromEEPROM() {
 
-  //TODO
+  int offset = 0;
+  signed char T = -1; //temp -128 ; 127 
+  byte H = 0xFF; //humidity 0 - 100
+  byte B = 0xFF; //battery 0 - 100
+
+  while(true){
+
+     T = EEPROM.read(offset++);
+     H = EEPROM.read(offset++);
+     B = EEPROM.read(offset++);
+
+     if(T == B && B == H && H == 0) //empty slot
+        break;
+
+      allData.Temperature = T;
+      allData.Humidity = H;
+      allData.EspId = _EspId;
+      allData.BatteryLevel = B;
+
+      if(!SendData()) // trying to senddata
+        return;
+  }
+
+  //clear EEPROM
+  for (int i = 0; i < MAXLEN; i++)
+    EEPROM.write(i, 0);
+
+  EEPROM.commit();
+  
 }
 
 void triggerIftttEvent() {
@@ -282,6 +363,7 @@ bool SecProblem() {
 
   delay(100);
   last = analogRead(xpin);
+  Serial.println(last);
 
   medianOfThree = (firstOne + mid + last) / 3 ;
 
@@ -303,13 +385,11 @@ long long endTime; //= beginTime + 60;
 bool SecurityRoutineProblem() {
 
   //Serial.println("new episode!");
-  
+
   beginTime = millis() / 1000;
   endTime = beginTime + 600;
-  
-  while (beginTime < endTime) {
 
-    if (SecON && CheckWordFromChat("--off")) {
+   if (SecON && CheckWordFromChat("--off")) {
 
       SecON = false;
       //Serial.println("done");
@@ -323,6 +403,9 @@ bool SecurityRoutineProblem() {
 
     }
 
+
+  while (beginTime < endTime) {
+    
     if (SecON && SecProblem() ) {
       triggerIftttEvent();
       sendTelegramMessage("someone is trying to steal your hive!");
@@ -333,9 +416,10 @@ bool SecurityRoutineProblem() {
     Serial.println("cycleDone");
 #endif
     beginTime += millis() / 1000;
-    
-  }
+    delay(500);
 
+  }
+  
   return false;
 }
 
