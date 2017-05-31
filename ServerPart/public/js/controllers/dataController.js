@@ -76,6 +76,7 @@ var dataController = (function() {
         dataService.getEspData(esp).then(function(response) {
             let data = response.result.data;
             data = data.slice();
+            this.firstData = data;
             proccessDate(data,".temp_graphic",".humidity_graphic")
         });
     }    
@@ -107,7 +108,9 @@ var dataController = (function() {
         dataService.getEspData(esp).then(function(response) {
             let data = response.result.data;
             data = data.slice();
+            this.secondData = data;
             proccessDate(data,".temp_graphic_second",".humidity_graphic_second")
+            compareTempeerature(this.firstData,this.secondData,".comp_temp_graphic");
         });
     }
 
@@ -130,8 +133,6 @@ var dataController = (function() {
         let date2 = new Date(time2.year, time2.month, time2.day, 
             time2.hour, time2.minute);
         let diff = new Date(date1.getTime() - date2.getTime());
-        // let diff = date1.getTime() - date2.getTime();
-        // console.log(date1 - date2);
         return {
             month: (diff.getMonth()).toString(),
             day: (diff.getDate()).toString(),
@@ -139,13 +140,6 @@ var dataController = (function() {
             hour: (diff.getHours()).toString(),
             minute: (diff.getMinutes()).toString()
         }
-        // return {
-        //     month: (parseInt(time1.month) - parseInt(time2.month)).toString(),
-        //     day: (parseInt(time1.day) - parseInt(time2.day)).toString(),
-        //     year: (parseInt(time1.year) - parseInt(time2.year)).toString(),
-        //     hour: (parseInt(time1.hour) - parseInt(time2.hour)).toString(),
-        //     minute: (parseInt(time1.minute) - parseInt(time2.minute)).toString(),
-        // }
     }
     function sumTime(time1, time2)
     {
@@ -162,75 +156,15 @@ var dataController = (function() {
             hour: (sum.getHours()).toString(),
             minute: (sum.getMinutes()).toString()
         }
-        // return {
-        //     month: (parseInt(time1.month) + parseInt(time2.month)).toString(),
-        //     day: (parseInt(time1.day) + parseInt(time2.day)).toString(),
-        //     year: (parseInt(time1.year) + parseInt(time2.year)).toString(),
-        //     hour: (parseInt(time1.hour) + parseInt(time2.hour)).toString(),
-        //     minute: (parseInt(time1.minute) + parseInt(time2.minute)).toString(),
-        // }
     }
 
-    // var svg = d3.select("svg");
-    // var data = JSONData.slice();
-    // function proccessData(data){
-    //     let json = d3.select();
-
-    //     var svg = d3.select("svg"),
-    //         margin = {top: 20, right: 20, bottom: 30, left: 50},
-    //         width = +svg.attr("width") - margin.left - margin.right,
-    //         height = +svg.attr("height") - margin.top - margin.bottom,
-    //         g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    //     var parseTime = d3.timeParse("%d-%b-%y");
-
-    //     var x = d3.scaleTime()
-    //         .rangeRound([0, width]);
-
-    //     var y = d3.scaleLinear()
-    //         .rangeRound([height, 0]);
-
-    //     var area = d3.area()
-    //         .x(function(d) { return x(d.date); })
-    //         .y1(function(d) { return y(d.close); });
-
-    //     d3.tsv("data.tsv", function(d) {
-    //       d.date = parseTime(d.date);
-    //       d.close = +d.close;
-    //       return d;
-    //     }, function(error, data) {
-    //       if (error) throw error;
-
-    //       x.domain(d3.extent(data, function(d) { return d.date; }));
-    //       y.domain([0, d3.max(data, function(d) { return d.close; })]);
-    //       area.y0(y(0));
-
-    //       g.append("path")
-    //           .datum(data)
-    //           .attr("fill", "steelblue")
-    //           .attr("d", area);
-
-    //       g.append("g")
-    //           .attr("transform", "translate(0," + height + ")")
-    //           .call(d3.axisBottom(x));
-
-    //       g.append("g")
-    //           .call(d3.axisLeft(y))
-    //         .append("text")
-    //           .attr("fill", "#000")
-    //           .attr("transform", "rotate(-90)")
-    //           .attr("y", 6)
-    //           .attr("dy", "0.71em")
-    //           .attr("text-anchor", "end")
-    //           .text("Price ($)");
-    //     });
-    // }
     function proccessDate(data, d3selectorTemp, d3selectorHumidity)
     {
         proccessTemperature(data, d3selectorTemp);
         proccessHumidity(data, d3selectorHumidity);
     }
     function proccessTemperature(data, d3selectorTemp) {
+        console.log(data);
         // let widthPixels = $(".temp_graphic").width();
         let widthPixels = $(d3selectorTemp).width();
         let heightPixels = $(d3selectorTemp).height();
@@ -239,24 +173,35 @@ var dataController = (function() {
             width = widthPixels - margin.left - margin.right,
             height = heightPixels - margin.top - margin.bottom;
 
-        let parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
+        let parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S");
 
-        let x = d3.time.scale()
+        let x = d3.scaleTime()
             .range([0, width]);
 
-        let y = d3.scale.linear()
+        let y = d3.scaleLinear()
             .range([height, 0]);
 
-        let xAxis = d3.svg.axis()
+        // let xAxis = d3.svg.axis()
+        //     .scale(x)
+        //     .orient("bottom")
+        //     .tickFormat(d3.timeFormat("%m/%d %H:%M"));;
+
+        // let yAxis = d3.svg.axis()
+        //     .scale(y)
+        //     .orient("left");
+
+
+
+        let xAxis = d3.axisBottom()
             .scale(x)
-            .orient("bottom")
-            .tickFormat(d3.time.format("%m/%d %H:%M"));;
+            .tickFormat(d3.timeFormat("%m/%d %H:%M"));;
 
-        let yAxis = d3.svg.axis()
-            .scale(y)
-            .orient("left");
+        let yAxis = d3.axisLeft()
+            .scale(y);
 
-        let area = d3.svg.area()
+
+
+        let area = d3.area()
             .x(function(d) { return x(d.date); })
             .y0(height)
             .y1(function(d) { return y(d.close); });
@@ -312,24 +257,36 @@ var dataController = (function() {
             width = widthPixels - margin.left - margin.right,
             height = heightPixels - margin.top - margin.bottom;
 
-        let parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
+        let parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S");
 
-        let x = d3.time.scale()
+        let x = d3.scaleTime()
             .range([0, width]);
 
-        let y = d3.scale.linear()
+        let y = d3.scaleLinear()
             .range([height, 0]);
 
-        let xAxis = d3.svg.axis()
+        // let xAxis = d3.svg.axis()
+        //     .scale(x)
+        //     .orient("bottom")
+        //     .tickFormat(d3.timeFormat("%m/%d %H:%M"));;
+
+        // let yAxis = d3.svg.axis()
+        //     .scale(y)
+        //     .orient("left");
+
+        // let area = d3.svg.area()
+
+
+        let xAxis = d3.axisBottom()
             .scale(x)
-            .orient("bottom")
-            .tickFormat(d3.time.format("%m/%d %H:%M"));;
+            .tickFormat(d3.timeFormat("%m/%d %H:%M"));;
 
-        let yAxis = d3.svg.axis()
-            .scale(y)
-            .orient("left");
+        let yAxis = d3.axisLeft()
+            .scale(y);
 
-        let area = d3.svg.area()
+
+
+        let area = d3.area()
             .x(function(d) { return x(d.date); })
             .y0(height)
             .y1(function(d) { return y(d.close); });
@@ -377,6 +334,116 @@ var dataController = (function() {
                 .text("Humidity");
     }
 
+    function compareTempeerature(firstData,secondData,selector)
+    {
+        let widthPixels = $(selector).width();
+        let heightPixels = $(selector).height();
+
+        let margin = {top: 20, right: 20, bottom: 75, left: 50},
+            width = widthPixels - margin.left - margin.right,
+            height = heightPixels - margin.top - margin.bottom;
+
+        let parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
+
+        // set the ranges
+        var x = d3.scaleTime().range([0, width]);
+        var y0 = d3.scaleLinear().range([height, 0]);
+        var y1 = d3.scaleLinear().range([height, 0]);
+
+
+        // append the svg obgect to the body of the page
+        // appends a 'group' element to 'svg'
+        // moves the 'group' element to the top left margin
+        d3.select(selector + " svg").remove();
+        let svg = d3.select(selector)
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
+
+        // Get the data
+
+
+        // format the data
+        firstData.forEach(function(d) {
+            d.date = parseTime(d.moment_time);
+            d.close = +d.temperature;
+            // d.open = +d.open;
+        });
+
+
+        secondData.forEach(function(d) {
+            d.date = parseTime(d.moment_time);
+            d.close = +d.temperature;
+            // d.open = +d.open;
+        });
+
+
+        // define the 1st line
+        var valueline = d3.line()
+            .x(function (d) {
+                return x(d.date);
+            })
+            .y(function (d) {
+                return y0(d.close);
+            });
+
+        // define the 2nd line
+        var valueline2 = d3.line()
+            .x(function (d) {
+                return x(d.date);
+            })
+            .y(function (d) {
+                return y1(d.close);
+            });
+
+
+        // Scale the range of the data
+        x.domain(d3.extent(firstData, function (d) {
+            return d.date
+        }));
+
+        y0.domain([0, d3.max(firstData, function (d) {
+            return Math.max(d.close);
+        })]);
+        y1.domain([0, d3.max(secondData, function (d) {
+            return Math.max(d.close);
+        })]);
+
+        // Add the valueline path.
+        svg.append("path")
+            .data([firstData])
+            .attr("class", "line")
+            .attr("d", valueline);
+
+        // Add the valueline2 path.
+        svg.append("path")
+            .data([secondData])
+            .attr("class", "line")
+            .style("stroke", "red")
+            .attr("stroke","red")
+            .attr("d", valueline2);
+
+
+        // Add the X Axis
+        svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+        // Add the Y0 Axis
+        svg.append("g")
+            .attr("class", "axisSteelBlue")
+            .call(d3.axisLeft(y0));
+
+        // Add the Y1 Axis
+        svg.append("g")
+            .attr("class", "axisRed")
+            .attr("transform", "translate( " + width + ", 0 )")
+            .call(d3.axisRight(y1));
+
+    }
     return {
         showEspData,
         compareEspsData,
