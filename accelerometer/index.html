@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style> /* set the CSS */
+
+.line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 2px;
+}
+
+.axisSteelBlue text {
+    fill: steelblue;
+}
+
+.axisRed text {
+    fill: red;
+}
+
+</style>
+<body>
+
+<!-- load the d3.js library -->
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+    var firstData = [{
+        close: 20,
+        moment_time: new Date("1-May-12"),
+        open: 22
+    },
+        {
+            close: 21,
+            moment_time: new Date("2-May-12"),
+            open: 11
+        },
+        {
+            close: 22,
+            moment_time: new Date("3-May-12"),
+            open: 15
+        }, {
+            close: 19,
+            moment_time: new Date("4-May-12"),
+            open: 15
+        }, {
+            close: 20,
+            moment_time: new Date("5-May-12"),
+            open: 122
+        }, {
+            close: 21,
+            moment_time:new Date("6-May-12"),
+            open: 222
+        },{
+            close: 23,
+            moment_time: new Date("7-May-12"),
+            open: 222
+        },{
+            close: 24,
+            moment_time: new Date("8-May-12"),
+            open: 222
+        }];
+
+
+    var secondData = [{
+        close: 20,
+        moment_time:  new Date("1-May-12"),
+        open: 22
+    },
+        {
+            close: 10,
+            moment_time:  new Date("2-May-12"),
+            open: 22
+        },
+        {
+            close: 11,
+            moment_time:  new Date("3-May-12"),
+            open: 22
+        }, {
+            close: 12,
+            moment_time: new Date("4-May-12"),
+            open: 22
+        }, {
+            close: 13,
+            moment_time:  new Date("5-May-12"),
+            open: 22
+        }, {
+            close: 20,
+            moment_time:  new Date("6-May-12"),
+            open: 22
+        },{
+            close: 20,
+            moment_time:  new Date("7-May-12"),
+            open: 22
+        },{
+            close: 20,
+            moment_time:  new Date("8-May-12"),
+            open: 22
+        }];
+
+
+
+    // set the dimensions and margins of the graph
+    var margin = {top: 20, right: 40, bottom: 30, left: 50},
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
+
+    // parse the date / time
+    var parseTime = d3.timeParse("%B %d, %Y");
+
+    // set the ranges
+    var x = d3.scaleTime().range([0, width]);
+    var y0 = d3.scaleLinear().range([height, 0]);
+    var y1 = d3.scaleLinear().range([height, 0]);
+
+    // define the 1st line
+    var valueline = d3.line()
+        .x(function (d) {
+            return x(d.moment_time);
+        })
+        .y(function (d) {
+            return y0(d.close);
+        });
+
+    // define the 2nd line
+    var valueline2 = d3.line()
+        .x(function (d) {
+            return x(d.moment_time);
+        })
+        .y(function (d) {
+            return y1(d.close);
+        });
+
+    // append the svg obgect to the body of the page
+    // appends a 'group' element to 'svg'
+    // moves the 'group' element to the top left margin
+    var svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")");
+
+    // Get the data
+
+
+
+    // format the data
+    firstData.forEach(function(d) {
+        d.temperature = parseTime(d.date);
+        d.close = +d.close;
+        d.open = +d.open;
+    });
+
+
+    secondData.forEach(function(d) {
+        d.date = parseTime(d.date);
+        d.close = +d.close;
+        d.open = +d.open;
+    });
+
+
+    // Scale the range of the data
+    x.domain(d3.extent(firstData, function (d) {
+        return d.moment_time
+    }));
+
+    y0.domain([0, d3.max(firstData, function (d) {
+        return Math.max(d.close);
+    })]);
+    y1.domain([0, d3.max(secondData, function (d) {
+        return Math.max(d.close);
+    })]);
+
+    // Add the valueline path.
+    svg.append("path")
+        .data([firstData])
+        .attr("class", "line")
+        .attr("d", valueline);
+
+    // Add the valueline2 path.
+    svg.append("path")
+        .data([secondData])
+        .attr("class", "line")
+        .style("stroke", "red")
+        .attr("stroke","red")
+        .attr("d", valueline2);
+
+
+    // Add the X Axis
+    svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x));
+
+    // Add the Y0 Axis
+    svg.append("g")
+        .attr("class", "axisSteelBlue")
+        .call(d3.axisLeft(y0));
+
+    // Add the Y1 Axis
+    svg.append("g")
+        .attr("class", "axisRed")
+        .attr("transform", "translate( " + width + ", 0 )")
+        .call(d3.axisRight(y1));
+
+
+</script>
+</body>
