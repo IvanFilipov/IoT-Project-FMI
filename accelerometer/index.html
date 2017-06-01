@@ -23,77 +23,41 @@
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
 
-    var firstData = [{
-        close: 20,
-        moment_time: new Date("1-May-12"),
-        open: 22
-    },
+    
+
+	var firstData = [{
+	        temperature: 20,
+	        moment_time: "2017-05-01 01:31:00",
+	        // open: 22
+	    },
         {
-            close: 21,
-            moment_time: new Date("2-May-12"),
-            open: 11
+            temperature: 21,
+            moment_time: "2017-05-02 01:31:00",
+            // open: 11
         },
         {
-            close: 22,
-            moment_time: new Date("3-May-12"),
-            open: 15
-        }, {
-            close: 19,
-            moment_time: new Date("4-May-12"),
-            open: 15
-        }, {
-            close: 20,
-            moment_time: new Date("5-May-12"),
-            open: 122
-        }, {
-            close: 21,
-            moment_time:new Date("6-May-12"),
-            open: 222
-        },{
-            close: 23,
-            moment_time: new Date("7-May-12"),
-            open: 222
-        },{
-            close: 24,
-            moment_time: new Date("8-May-12"),
-            open: 222
+            temperature: 22,
+            moment_time: "2017-05-03 01:31:00",
+            // open: 15
         }];
+        firstData = JSON.parse('[{"temperature":"5","humidity":"40","moment_time":"2017-05-01 01:31:00"}, {"temperature":"15","humidity":"40","moment_time":"2017-05-02 01:31:00"}, {"temperature":"10","humidity":"40","moment_time":"2017-05-03 01:31:00"}]');
+
 
 
     var secondData = [{
-        close: 20,
-        moment_time:  new Date("1-May-12"),
-        open: 22
-    },
+	        temperature: 20,
+	        moment_time:  "2017-05-01 01:31:00",
+	        // open: 22
+	    },
         {
-            close: 10,
-            moment_time:  new Date("2-May-12"),
-            open: 22
+            temperature: 10,
+            moment_time:  "2017-05-02 01:31:00",
+            // open: 22
         },
         {
-            close: 11,
-            moment_time:  new Date("3-May-12"),
-            open: 22
-        }, {
-            close: 12,
-            moment_time: new Date("4-May-12"),
-            open: 22
-        }, {
-            close: 13,
-            moment_time:  new Date("5-May-12"),
-            open: 22
-        }, {
-            close: 20,
-            moment_time:  new Date("6-May-12"),
-            open: 22
-        },{
-            close: 20,
-            moment_time:  new Date("7-May-12"),
-            open: 22
-        },{
-            close: 20,
-            moment_time:  new Date("8-May-12"),
-            open: 22
+            temperature: 11,
+            moment_time:  "2017-05-03 01:31:00",
+            // open: 22
         }];
 
 
@@ -104,30 +68,14 @@
         height = 500 - margin.top - margin.bottom;
 
     // parse the date / time
-    var parseTime = d3.timeParse("%B %d, %Y");
+    // var parseTime = d3.timeParse("%B %d, %Y");
+        let parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
 
     // set the ranges
     var x = d3.scaleTime().range([0, width]);
     var y0 = d3.scaleLinear().range([height, 0]);
     var y1 = d3.scaleLinear().range([height, 0]);
 
-    // define the 1st line
-    var valueline = d3.line()
-        .x(function (d) {
-            return x(d.moment_time);
-        })
-        .y(function (d) {
-            return y0(d.close);
-        });
-
-    // define the 2nd line
-    var valueline2 = d3.line()
-        .x(function (d) {
-            return x(d.moment_time);
-        })
-        .y(function (d) {
-            return y1(d.close);
-        });
 
     // append the svg obgect to the body of the page
     // appends a 'group' element to 'svg'
@@ -145,30 +93,58 @@
 
     // format the data
     firstData.forEach(function(d) {
-        d.temperature = parseTime(d.date);
-        d.close = +d.close;
-        d.open = +d.open;
+        d.date = parseTime(d.moment_time);
+        console.log(d.date);
+        d.close = +d.temperature;
+        // d.open = +d.open;
     });
 
 
     secondData.forEach(function(d) {
-        d.date = parseTime(d.date);
-        d.close = +d.close;
-        d.open = +d.open;
+        d.date = parseTime(d.moment_time);
+        d.close = +d.temperature;
+        // d.open = +d.open;
     });
+
+
+    // define the 1st line
+    var valueline = d3.line()
+        .x(function (d) {
+            return x(d.date);
+        })
+        .y(function (d) {
+            return y0(d.close);
+        });
+
+    // define the 2nd line
+    var valueline2 = d3.line()
+        .x(function (d) {
+            return x(d.date);
+        })
+        .y(function (d) {
+            return y1(d.close);
+        });
+
+
+
 
 
     // Scale the range of the data
     x.domain(d3.extent(firstData, function (d) {
-        return d.moment_time
+        return d.date
     }));
 
-    y0.domain([0, d3.max(firstData, function (d) {
-        return Math.max(d.close);
-    })]);
-    y1.domain([0, d3.max(secondData, function (d) {
-        return Math.max(d.close);
-    })]);
+    // y0.domain([0, d3.max(firstData, function (d) {
+    //     return Math.max(d.close);
+    // })]);
+    // y1.domain([0, d3.max(secondData, function (d) {
+    //     return Math.max(d.close);
+    // })]);
+	y0.domain([d3.min(firstData, function(d) { return d.close; }),
+                    d3.max(firstData, function(d) { return d.close; })]);
+
+	y1.domain([d3.min(secondData, function(d) { return d.close; }),
+                    d3.max(secondData, function(d) { return d.close; })]);
 
     // Add the valueline path.
     svg.append("path")
@@ -182,6 +158,7 @@
         .attr("class", "line")
         .style("stroke", "red")
         .attr("stroke","red")
+        // .attr("d", valueline);
         .attr("d", valueline2);
 
 
@@ -201,6 +178,87 @@
         .attr("transform", "translate( " + width + ", 0 )")
         .call(d3.axisRight(y1));
 
+
+
+
+
+
+
+
+
+
+// var firstData = [{
+//         close: 20,
+//         moment_time: new Date("1-May-12"),
+//         // open: 22
+//     },
+//         {
+//             close: 21,
+//             moment_time: new Date("2-May-12"),
+//             // open: 11
+//         },
+//         {
+//             close: 22,
+//             moment_time: new Date("3-May-12"),
+//             // open: 15
+//         }, {
+//             close: 19,
+//             moment_time: new Date("4-May-12"),
+//             // open: 15
+//         }, {
+//             close: 20,
+//             moment_time: new Date("5-May-12"),
+//             // open: 122
+//         }, {
+//             close: 21,
+//             moment_time:new Date("6-May-12"),
+//             // open: 222
+//         },{
+//             close: 23,
+//             moment_time: new Date("7-May-12"),
+//             // open: 222
+//         },{
+//             close: 24,
+//             moment_time: new Date("8-May-12"),
+//             open: 222
+//         }];
+
+
+//     var secondData = [{
+//         close: 20,
+//         moment_time:  new Date("1-May-12"),
+//         // open: 22
+//     },
+//         {
+//             close: 10,
+//             moment_time:  new Date("2-May-12"),
+//             // open: 22
+//         },
+//         {
+//             close: 11,
+//             moment_time:  new Date("3-May-12"),
+//             // open: 22
+//         }, {
+//             close: 12,
+//             moment_time: new Date("4-May-12"),
+//             // open: 22
+//         }, {
+//             close: 13,
+//             moment_time:  new Date("5-May-12"),
+//             // open: 22
+//         }, {
+//             close: 20,
+//             moment_time:  new Date("6-May-12"),
+//             // open: 22
+//         },{
+//             close: 20,
+//             moment_time:  new Date("7-May-12"),
+//             // open: 22
+//         },{
+//             close: 20,
+//             moment_time:  new Date("8-May-12"),
+//             // open: 22
+//         }];
 
 </script>
 </body>
