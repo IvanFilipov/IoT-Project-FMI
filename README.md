@@ -1,2 +1,5 @@
 # IoT-Project-FMI
-code from our project during FMI 's internet of things course
+
+Many small devices with a simple purpose of monitoring bee hives and sending useful data to a remote server.
+User interface with graphics and online data observation.
+All information stored in database.
